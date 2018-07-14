@@ -25,13 +25,13 @@ channelForm.addEventListener('submit', e => {
 
 // Load auth2 library
  
-function handleClientLoad() {
+const handleClientLoad = () => {
 	gapi.load('client:auth2', initClient);
 }
 
 // Init API client library and set up sign in listeners
 
-function initClient() {
+const initClient = () => {
 	gapi.client.init({
 		discoveryDocs: DISCOVERY_DOCS,
 		clientId: CLIENT_ID,
@@ -49,7 +49,7 @@ function initClient() {
 }
 
 // Update UI sign-in in state changes
-function updateSigninStatus(isSignedIn) {
+const updateSigninStatus = (isSignedIn) => {
   if (isSignedIn) {
     authorizeButton.style.display = 'none';
     signoutButton.style.display = 'block';
@@ -65,16 +65,16 @@ function updateSigninStatus(isSignedIn) {
 }
 
 // Handle login
-function handleAuthClick(event) {
+const handleAuthClick = (event) => {
   gapi.auth2.getAuthInstance().signIn();
 }
 // Sign out
-function handleSignoutClick(event) {
+const handleSignoutClick = (event) => {
   gapi.auth2.getAuthInstance().signOut();
 }
 
 // Display channel data
-function showChannelData(data) {
+const showChannelData = (data) => {
 	const channelData = document.getElementById('channel-data');
 	channelData.innerHTML = data;
 }
@@ -82,7 +82,7 @@ function showChannelData(data) {
 
 // Get channel from API
 
-function getChannel(channel) {
+const getChannel = (channel) => {
   gapi.client.youtube.channels
   .list({
     part: 'snippet,contentDetails,statistics',
@@ -96,8 +96,8 @@ function getChannel(channel) {
 		<ul class="collection">
 			<li class="collection-item">Title: ${channel.snippet.title}</li>
 			<li class="collection-item">ID: ${channel.id}</li>
-			<li class="collection-item">Subscribers: ${channel.statistics.subscriberCount}</li>
-			<li class="collection-item">View: ${channel.statistics.viewCount}</li>
+			<li class="collection-item">Subscribers: ${numberWithCommas(channel.statistics.subscriberCount)}</li>
+			<li class="collection-item">View: ${numberWithCommas(channel.statistics.viewCount)}</li>
 			<li class="collection-item">Videos: ${channel.statistics.videoCount}</li>
 		</ul>
 		<p>${channel.snippet.description}</p>
@@ -114,10 +114,11 @@ function getChannel(channel) {
               
   })
   .catch( err => alert('No Channel By That Name') );
-
 }
 
-
+const numberWithCommas = (x) => {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
 
 
 
