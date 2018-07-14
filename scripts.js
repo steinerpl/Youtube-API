@@ -10,7 +10,7 @@ const channelForm = document.getElementById('channel-form');
 const channelInput = document.getElementById('channel-input');
 const videoContainer = document.getElementById('video-container');
 
-const defaultChangel = '';
+const defaultChangel = 'web';
 
 
 // Load auth2 library
