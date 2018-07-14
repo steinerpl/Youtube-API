@@ -106,6 +106,9 @@ const getChannel = (channel) => {
     `;
 
     showChannelData(output);
+
+    const playlistId = channel.contentDetails.relatedPlaylist.uploads;
+    requestVideoPlaylist(playlistId);
     /*
     appendPre('This channel\'s ID is ' + channel.id + '. ' +
               'Its title is \'' + channel.snippet.title + ', ' +
@@ -116,11 +119,26 @@ const getChannel = (channel) => {
   .catch( err => alert('No Channel By That Name') );
 }
 
+
+
+// Add commas to number
 const numberWithCommas = (x) => {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
+const requestVideoPlaylist = (playlistId) => {
+	const requestOptions = {
+		playlistId: playlistId,
+		part: 'snippet',
+		maxResults: 10
+	}
 
+	const request = gapi.client.youtube.playlistItems.list(requestOptions);
+
+	request.execute(response => {
+		console.log(response);
+	});
+}
 
 
 
