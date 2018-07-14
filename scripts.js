@@ -10,7 +10,7 @@ const channelForm = document.getElementById('channel-form');
 const channelInput = document.getElementById('channel-input');
 const videoContainer = document.getElementById('video-container');
 
-const defaultChannel = 'SteinerPL';
+const defaultChannel = 'techguyweb';
 
 
 // Form submit and change channel
@@ -88,7 +88,7 @@ const getChannel = (channel) => {
     part: 'snippet,contentDetails,statistics',
     forUsername: channel
   })
-  .then(function(response) {
+  .then( (response) => {
   	console.log(response);
   	
     const channel = response.result.items[0];
@@ -109,11 +109,6 @@ const getChannel = (channel) => {
 
     const playlistId = channel.contentDetails.relatedPlaylist.uploads;
     requestVideoPlaylist(playlistId);
-    /*
-    appendPre('This channel\'s ID is ' + channel.id + '. ' +
-              'Its title is \'' + channel.snippet.title + ', ' +
-              'and it has ' + channel.statistics.viewCount + ' views.');
-              */
               
   })
   .catch( err => alert('No Channel By That Name') );
