@@ -10,7 +10,7 @@ const channelForm = document.getElementById('channel-form');
 const channelInput = document.getElementById('channel-input');
 const videoContainer = document.getElementById('video-container');
 
-const defaultChangel = 'web';
+const defaultChannel = 'SteinerPL';
 
 
 // Load auth2 library
@@ -45,7 +45,7 @@ function updateSigninStatus(isSignedIn) {
     signoutButton.style.display = 'block';
     content.style.display = 'block';
     videoContainer.style.display = 'block';
-    getChannel(defaultChangel);
+    getChannel(defaultChannel);
   } else {
     authorizeButton.style.display = 'block';
     signoutButton.style.display = 'none';
