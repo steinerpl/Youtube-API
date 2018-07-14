@@ -24,31 +24,32 @@ channelForm.addEventListener('submit', e => {
 
 
 // Load auth2 library
- 
 const handleClientLoad = () => {
 	gapi.load('client:auth2', initClient);
 }
 
+
 // Init API client library and set up sign in listeners
-
 const initClient = () => {
-	gapi.client.init({
-		discoveryDocs: DISCOVERY_DOCS,
-		clientId: CLIENT_ID,
-		scope: SCOPES
-	}).then(() => {
+	gapi.client
+		.init({
+			discoveryDocs: DISCOVERY_DOCS,
+			clientId: CLIENT_ID,
+			scope: SCOPES
+		})
+		.then(() => {
+			// Listen for sign-in state changes.
+			gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
 
-		// Listen for sign-in state changes.
-    gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
-
-    // Handle the initial sign-in state.
-    updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
-    authorizeButton.onclick = handleAuthClick;
-    signoutButton.onclick = handleSignoutClick;
-	});
+			// Handle initial sign-in state.
+			updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+			authorizeButton.onclick = handleAuthClick;
+			signoutButton.onclick = handleSignoutClick;
+		});
 }
 
-// Update UI sign-in in state changes
+
+// Update UI sign in state changes
 const updateSigninStatus = (isSignedIn) => {
   if (isSignedIn) {
     authorizeButton.style.display = 'none';
@@ -64,14 +65,18 @@ const updateSigninStatus = (isSignedIn) => {
   }
 }
 
+
 // Handle login
-const handleAuthClick = (event) => {
+const handleAuthClick = () => {
   gapi.auth2.getAuthInstance().signIn();
 }
-// Sign out
-const handleSignoutClick = (event) => {
+
+
+// Handle logout
+const handleSignoutClick = () => {
   gapi.auth2.getAuthInstance().signOut();
 }
+
 
 // Display channel data
 const showChannelData = (data) => {
@@ -81,39 +86,35 @@ const showChannelData = (data) => {
 
 
 // Get channel from API
-
 const getChannel = (channel) => {
   gapi.client.youtube.channels
-  .list({
-    part: 'snippet,contentDetails,statistics',
-    forUsername: channel
-  })
-  .then( (response) => {
-  	console.log(response);
-  	
-    const channel = response.result.items[0];
-    const output = `
-		<ul class="collection">
-			<li class="collection-item">Title: ${channel.snippet.title}</li>
-			<li class="collection-item">ID: ${channel.id}</li>
-			<li class="collection-item">Subscribers: ${numberWithCommas(channel.statistics.subscriberCount)}</li>
-			<li class="collection-item">View: ${numberWithCommas(channel.statistics.viewCount)}</li>
-			<li class="collection-item">Videos: ${channel.statistics.videoCount}</li>
-		</ul>
-		<p>${channel.snippet.description}</p>
-		<hr>
-		<a class="btn grey darken-2" target="_blank" href="https://youtube.com/${channel.snippet.customUrl}">Visit Channel</a>
-    `;
+	  .list({
+	    part: 'snippet,contentDetails,statistics',
+	    forUsername: channel
+	  })
+	  .then((response) => {
+	  	console.log(response);
+	    const channel = response.result.items[0];
 
-    showChannelData(output);
+	    const output = `
+				<ul class="collection">
+					<li class="collection-item">Title: ${channel.snippet.title}</li>
+					<li class="collection-item">ID: ${channel.id}</li>
+					<li class="collection-item">Subscribers: ${numberWithCommas(channel.statistics.subscriberCount)}</li>
+					<li class="collection-item">Views: ${numberWithCommas(channel.statistics.viewCount)}</li>
+					<li class="collection-item">Videos: ${numberWithCommas(channel.statistics.videoCount)}</li>
+				</ul>
+				<p>${channel.snippet.description}</p>
+				<hr>
+				<a class="btn grey darken-2" target="_blank" href="https://youtube.com/${channel.snippet.customUrl}">Visit Channel</a>
+	    `;
+	    showChannelData(output);
 
-    const playlistId = channel.contentDetails.relatedPlaylist.uploads;
-    requestVideoPlaylist(playlistId);
-              
-  })
-  .catch( err => alert('No Channel By That Name') );
+	    const playlistId = channel.contentDetails.relatedPlaylists.uploads;
+	    requestVideoPlaylist(playlistId);          
+	  })
+	  .catch(err => alert('No Channel By That Name') );
 }
-
 
 
 // Add commas to number
@@ -122,17 +123,37 @@ const numberWithCommas = (x) => {
 }
 
 const requestVideoPlaylist = (playlistId) => {
-	const requestOptions = {
-		playlistId: playlistId,
-		part: 'snippet',
-		maxResults: 10
-	};
+  const requestOptions = {
+    playlistId: playlistId,
+    part: 'snippet',
+    maxResults: 10
+  };
 
-	const request = gapi.client.youtube.playlistItems.list(requestOptions);
+  const request = gapi.client.youtube.playlistItems.list(requestOptions);
 
-	request.execute(response => {
-		console.log(response);
-	});
+  request.execute(response => {
+    console.log(response);
+    const playListItems = response.result.items;
+    if (playListItems) {
+      let output = '<br><h4 class="center-align">Latest Videos</h4>';
+
+      // Loop through videos and append output
+      playListItems.forEach(item => {
+        const videoId = item.snippet.resourceId.videoId;
+
+        output += `
+          <div class="col s3">
+          <iframe width="100%" height="auto" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+          </div>
+        `;
+      });
+
+      // Output videos
+      videoContainer.innerHTML = output;
+    } else {
+      videoContainer.innerHTML = 'No Uploaded Videos';
+    }
+  });
 }
 
 
