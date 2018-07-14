@@ -66,9 +66,10 @@ function handleSignoutClick(event) {
 // Get channel from API
 
 function getChannel(channel) {
-        gapi.client.youtube.channels.list({
-          'part': 'snippet,contentDetails,statistics',
-          'forUsername': 'GoogleDevelopers'
+        gapi.client.youtube.channels
+        .list({
+          part: 'snippet,contentDetails,statistics',
+          forUsername: channel
         })
         .then(function(response) {
         	console.log(response);
